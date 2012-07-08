@@ -1,0 +1,105 @@
+timestamp: 2012-07-06T22:29:21.206000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512),
+    address CHAR(512),
+    city CHAR(512),
+    zip CHAR(512),
+    phone CHAR(512)
+);
+success!
+timestamp: 2012-07-06T22:29:21.449000
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2012-07-06T22:29:21.704000
+CREATE TABLE auth_membership(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    group_id INTEGER REFERENCES auth_group(id) ON DELETE CASCADE
+);
+success!
+timestamp: 2012-07-06T22:29:21.902000
+CREATE TABLE auth_permission(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    group_id INTEGER REFERENCES auth_group(id) ON DELETE CASCADE,
+    name CHAR(512),
+    table_name CHAR(512),
+    record_id INTEGER
+);
+success!
+timestamp: 2012-07-06T22:29:22.135000
+CREATE TABLE auth_event(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    time_stamp TIMESTAMP,
+    client_ip CHAR(512),
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    origin CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2012-07-06T22:29:22.369000
+CREATE TABLE auth_cas(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    created_on TIMESTAMP,
+    service CHAR(512),
+    ticket CHAR(512),
+    renew CHAR(1)
+);
+success!
+timestamp: 2012-07-06T22:29:22.751000
+CREATE TABLE party(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name CHAR(512),
+    starttime TIMESTAMP,
+    numofseats INTEGER,
+    numofattending INTEGER,
+    place CHAR(512)
+);
+success!
+timestamp: 2012-07-06T22:29:22.905000
+CREATE TABLE party_question(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    party INTEGER REFERENCES party(id) ON DELETE CASCADE,
+    type CHAR(512),
+    question CHAR(512),
+    choises TEXT
+);
+success!
+timestamp: 2012-07-06T22:29:23.103000
+CREATE TABLE party_answer(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question INTEGER REFERENCES party_question(id) ON DELETE CASCADE,
+    answer CHAR(512),
+    guest INTEGER REFERENCES auth_user(id) ON DELETE CASCADE,
+    answertime TIMESTAMP
+);
+success!
+timestamp: 2012-07-06T22:29:23.532000
+CREATE TABLE guest_party_attending(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    party INTEGER REFERENCES party(id) ON DELETE CASCADE,
+    guest INTEGER REFERENCES auth_user(id) ON DELETE CASCADE
+);
+success!
+timestamp: 2012-07-06T22:29:23.735000
+CREATE TABLE actions(
+    id INTEGER PRIMARY KEY AUTOINCREMENT
+);
+success!
+timestamp: 2012-07-06T22:38:00.238000
+ALTER TABLE auth_user ADD birthdate CHAR(512);
+timestamp: 2012-07-06T22:38:01.188000
+ALTER TABLE auth_user ADD representation CHAR(512);
+timestamp: 2012-07-06T23:26:09.671000
+ALTER TABLE party ADD owner INTEGER REFERENCES auth_user(id) ON DELETE CASCADE;

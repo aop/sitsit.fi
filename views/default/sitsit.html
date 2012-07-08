@@ -1,0 +1,36 @@
+<html>
+<head>
+	{{
+	response.files.insert(0,URL('static','js/jquery.js'))
+	response.include_files()
+	}}
+</head>
+<body>
+{{if not found:}}
+Ei loytyny
+{{else:}}
+{{if owner:}}
+	{{=BEAUTIFY(sitsi)}}
+	{{=BEAUTIFY(people)}}
+{{pass}}
+{{if auth.user:}}
+<script type="text/javascript">
+function attend(){
+	console.log("attending");
+	$.ajax({
+	  url: "{{=URL(f='join')}}",
+	  data: {id: '{{=sitsi['id']}}'}
+	}).done(function(data) { 
+	  $("#munid").html(data);
+	});
+}
+</script>
+<button onclick="attend()">Join</button>
+
+<div id="munid"></div>
+{{pass}}
+{{pass}}
+
+</body>
+
+</html>
