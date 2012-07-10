@@ -91,14 +91,21 @@ db.define_table("party",
 	Field("numofseats","integer"),
 	Field("numofattending","integer"),
 	Field("place"),
-	Field("owner",db.auth_user)
+	Field("owner",db.auth_user),
+	Field("secrecy") #Either 'public', 'link' or 'invite'
+	)
+	
+db.define_table("invite",
+	Field("email"),
+	Field("party",db.party)
 	)
 	
 db.define_table("party_question",
 	Field("party",db.party),
 	Field("type"), #Either question or select
 	Field("question"),
-	Field("choises","list:string")
+	Field("choises","list:string"),
+	Field("required","boolean")
 	)
 	
 	

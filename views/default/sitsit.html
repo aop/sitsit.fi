@@ -25,7 +25,12 @@ function attend(){
 	});
 }
 </script>
-<button onclick="attend()">Join</button>
+<!--<button onclick="attend()">Join</button>-->
+{{if attending:}}
+You already attend
+{{else:}}
+<a href="{{=URL('default','join',args=sitsi['id'])}}">Join</a>
+{{pass}}
 
 <div id="munid"></div>
 {{pass}}

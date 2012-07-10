@@ -4,7 +4,8 @@
 
 <body>
 <p>
-Hei!
+
+Hei{{if auth.user:}}, {{=auth.user.first_name}}{{pass}}!
 
 Tervetuloa sitsit.fi-palveluun, väsymättömään partygeneraattoriisi
 </p>
@@ -12,5 +13,14 @@ Tervetuloa sitsit.fi-palveluun, väsymättömään partygeneraattoriisi
 <a href="{{=URL('default','user',args='register')}}">register</a>
 
 <a href="{{=URL('default','sitsit')}}">Lisaa bileet</a>
+
+<a href="{{=URL('default','user',args='login')}}">Login</a>
+
+<a href="{{=URL('default','user',args='logout')}}">Logout</a>
+
+<p>Tassa kaikki bileet:</p>
+{{for i,party in enumerate(parties):}}
+<p>{{=(i+1)}}: <a href="{{=URL('default','sitsit',args=party.id)}}">{{=party.name}}</a></p>
+{{pass}}
 
 </body> 

@@ -10,12 +10,13 @@
 #########################################################################
 
 def index():
-    """
-    example action using the internationalization operator T and flash
-    rendered by views/default/index.html or views/generic.html
-    """
-    response.flash = "Welcome to web2py!"
-    return dict(message=T('Hello World'))
+	"""
+	example action using the internationalization operator T and flash
+	rendered by views/default/index.html or views/generic.html
+	"""
+	response.flash = "Welcome to web2py!"
+	sitsit=db().select(db.party.ALL)
+	return dict(message=T('Hello World'),parties=sitsit)
 
 
 def sitsit(): 
@@ -33,18 +34,73 @@ def sitsit():
 		if auth.is_logged_in():
 			if auth.user.id == sitsi.owner:
 				owner=True
-		if sitsit:
-			return dict(sitsi=sitsi.as_dict(),found=True,people=people,owner=owner)
+		if user_attending(request.args[0],auth.user.id):
+			attending=True
 		else:
-			return dict(found=False)
+			attending=False
+		if sitsit:
+			return dict(sitsi=sitsi.as_dict(),found=True,people=people,owner=owner,attending=attending)
+		else:
+			return dict(found=False,attending=attending)
 			
-def join():
+def joinAJAX():
 	if auth.is_logged_in() and request.vars.id:
 		if db((db.guest_party_attending.party==request.vars.id) & (db.guest_party_attending.guest==auth.user.id)).select().first():
 			return "Already attending"
 		db.guest_party_attending.insert(party=request.vars.id,guest=auth.user.id)
 		return "Successfully joined "+ auth.user.first_name + " on sitsi nro: "+request.vars.id
 	return "False"
+	
+def join():
+	if not request.args or not request.args[0].isdigit() or not db.party[request.args[0]]:
+		raise HTTP(404)
+	sitsi = db.party[request.args[0]]
+	def user_invited(user):
+		if (db((db.invite.party == sitsi.id) & (db.invite.email == user.email)).select().first()):
+			return True
+		return False
+	if sitsi.secrecy == "invite":
+		if not auth.is_logged_in():
+			redirect(auth.settings.login_url)
+		if not user_invited(auth.user):
+			raise HTTP(403)
+	questions = db(db.party_question.party==sitsi.id).select()
+	question_list_for_form = l =[]
+	for q in questions:
+		tmp = []
+		if q.type == "question":
+			if q.required:
+				tmp.append(INPUT(_name=q.id,requires=IS_NOT_EMPTY(),_class="question_text_required",required=True))
+			else:
+				tmp.append(INPUT(_name=q.id,_class="question_text",required=False))
+		if q.type == "select":
+			for c in q.choises:
+				if q.required:
+					tmp.append(INPUT(_name=q.id,_type='radio',_value=c,value="test",_class="question_radio_required"))
+				else:
+					tmp.append(INPUT(_name=q.id,_type='radio',_value=c,value="test",_class="question_radio"))
+				tmp.append(c)
+			#s = INPUT(_name=q.id,*[OPTION(c,_value=c) for c in q.choises])
+			#l.append(s)
+		div = DIV(q.question,_class="questiondiv",*tmp)
+		l.append(div)
+	l.append(INPUT(_type="submit",value="Join"))
+	form = FORM(*l)
+	if user_attending(request.args[0],auth.user.id):
+		form = None
+	def check_user(form):
+		if not auth.is_logged_in():
+			form.errors.user = "Not logged in"
+	if form and form.validate(onvalidation=check_user):
+		for q in form.vars.keys():
+			db.party_answer.insert(question=q,answer=form.vars[q],guest=auth.user.id)
+		db.guest_party_attending.insert(party=request.args[0],guest=auth.user.id)
+	return dict(form=form)
+	
+def user_attending(partyid,userid):
+	if db((db.guest_party_attending.party==partyid) & (db.guest_party_attending.guest==userid)).select().first():
+		return True
+	return False
 
 def user():
     """
