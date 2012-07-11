@@ -101,6 +101,60 @@ def user_attending(partyid,userid):
 	if db((db.guest_party_attending.party==partyid) & (db.guest_party_attending.guest==userid)).select().first():
 		return True
 	return False
+	
+def fbregister():
+	state = request.vars.state
+	#check state for hacking
+	if state != response.session_id[response.session_id.find(":")+1:]:
+		raise HTTP(403, "Hacking attempt")
+
+	#for error:
+	# YOUR_REDIRECT_URI?
+	# error_reason=user_denied
+	# &error=access_denied
+	# &error_description=The+user+denied+your+request.
+	# &state=YOUR_STATE_VALUE
+	if 'error' in request.vars:
+		redirect(URL('default','index',args='error'))
+
+	#for success:
+	#state=YOUR_STATE_VALUE
+	#&code=CODE_GENERATED_BY_FACEBOOK
+
+	code=request.vars.code
+	#access then https://graph.facebook.com/oauth/access_token?
+	# client_id=YOUR_APP_ID
+	# &redirect_uri=YOUR_REDIRECT_URI
+	# &client_secret=YOUR_APP_SECRET
+	# &code=CODE_GENERATED_BY_FACEBOOK
+	import urllib
+	resp = urllib.urlopen("https://graph.facebook.com/oauth/access_token?client_id="+str(FB_APP_ID)+"&redirect_uri="+URL('default','fbregister',host=True)+"&client_secret="+FB_APP_SECRET+"&code="+code).read()
+	import urlparse
+	resp_decoded=urlparse.parse_qs(resp)
+	access_token=resp_decoded['access_token'][0]
+	# Load data from fb and register if not yet registered
+	fb_resp_raw = urllib.urlopen("https://graph.facebook.com/me?access_token="+access_token).read()
+	import json
+	fb_resp=json.loads(fb_resp_raw)
+	email = fb_resp['email']
+	first_name = fb_resp['first_name']
+	last_name = fb_resp['last_name']
+	fb_id = fb_resp['id']
+	fb_resp['registration_id'] = fb_resp['id']
+	fb_resp['password'] = ""
+	auth.get_or_create_user(fb_resp)
+	# from storage import Storage
+	# user = Storage(table_user._filter_fields(user, id=True)) 
+	# session.auth = Storage(user=user, last_visit=request.now, 
+		# expiration=self.settings.expiration, 
+		# hmac_key = web2py_uuid()) 
+	# self.user = user
+	#return str(db(db.auth_user.email == email).select().first())
+	auth.login_bare(email,"")
+	#return "User:" + str(auth.login_bare(email,""))
+	redirect(URL('default','index'))
+   
+   
 
 def user():
     """

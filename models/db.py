@@ -123,4 +123,10 @@ db.define_table("guest_party_attending",
 	
 db.define_table("actions",
 	)
+	
+db.define_table("fb_auth_tokens",
+	Field("user",db.auth_user),
+	Field("token"),
+	Field("expires","datetime")
+	)
 
