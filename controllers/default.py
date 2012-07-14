@@ -15,22 +15,34 @@ def index():
 	rendered by views/default/index.html or views/generic.html
 	"""
 	response.flash = "Welcome to web2py!"
-	sitsit=db().select(db.party.ALL)
-	import uuid
-	fb_token=uuid.uuid4()
-	db(db.fb_state_tokens.expires > datetime.datetime.now()).delete()
-	db.fb_state_tokens.insert(token=fb_token)
-	form=auth.login()
-	return dict(message=T('Hello World'),parties=sitsit,fb_token=fb_token,form=form)
+	sitsit=db(db.party.secrecy=="public").select()
+	layoutvars = getLayoutVars()
+	return dict(message=T('Hello World'),parties=sitsit,**layoutvars)
 
 
+def getLayoutVars():
+	if not auth.is_logged_in():
+		loginform=auth.login()
+		import uuid
+		fb_token=uuid.uuid4()
+		db(db.fb_state_tokens.expires > datetime.datetime.now()).delete()
+		db.fb_state_tokens.insert(token=fb_token)
+		return dict(loginform=loginform,fb_token=fb_token)
+	else:
+		return dict()
+	
 def sitsit(): 
+	layoutvars = getLayoutVars()
 	if len(request.args) == 0:
-		response.view = "%s/%s.%s" % (request.controller, request.function+"new", request.extension)
-		form = SQLFORM(db.party)
-		if form.process().accepted:
-			return redirect(URL(args=form.vars.id))
-		return dict(form=form)
+		if auth.is_logged_in():
+			response.view = "%s/%s.%s" % (request.controller, request.function+"new", request.extension) #sitsitnew.html
+			form = SQLFORM(db.party)
+			request.post_vars.owner = auth.user.id
+			form.vars.owner = auth.user.id
+			if form.process().accepted:
+				return redirect(URL(args=form.vars.id))
+			return dict(form=form,**layoutvars)
+		return redirect(URL('default','user',args='login'))
 	if len(request.args):
 		sitsiID = request.args[0]
 		sitsi = db.party[sitsiID]
@@ -39,14 +51,14 @@ def sitsit():
 		if auth.is_logged_in():
 			if auth.user.id == sitsi.owner:
 				owner=True
-		if user_attending(request.args[0],auth.user.id):
+		if auth.user and user_attending(request.args[0],auth.user.id):
 			attending=True
 		else:
 			attending=False
 		if sitsit:
-			return dict(sitsi=sitsi.as_dict(),found=True,people=people,owner=owner,attending=attending)
+			return dict(sitsi=sitsi.as_dict(),found=True,people=people,owner=owner,attending=attending,**layoutvars)
 		else:
-			return dict(found=False,attending=attending)
+			return dict(found=False,attending=attending,**layoutvars)
 			
 def joinAJAX():
 	if auth.is_logged_in() and request.vars.id:
@@ -100,6 +112,8 @@ def join():
 		for q in form.vars.keys():
 			db.party_answer.insert(question=q,answer=form.vars[q],guest=auth.user.id)
 		db.guest_party_attending.insert(party=request.args[0],guest=auth.user.id)
+		db(db.party.id==request.args[0]).update(numofattending=db.party.numofattending+1)
+		return redirect(URL('default','sitsit',args=request.args[0]))
 	return dict(form=form)
 	
 def user_attending(partyid,userid):
@@ -195,7 +209,7 @@ def user():
         @auth.requires_permission('read','table name',record_id)
     to decorate functions that need access control
     """
-    return dict(form=auth())
+    return dict(form=auth(),**getLayoutVars())
 
 
 def download():

@@ -1,9 +1,17 @@
 div#top {
 	width: 100%; 
 	background: #ddd; 
-	height: 60px; 
+	height: 75px; 
 	position: absolute; 
 	z-index: -1;
+}
+
+.map {
+	float: left;
+}
+
+div#map {
+	float: right;
 }
 
 .header {
@@ -45,6 +53,8 @@ p {
 	line-height: 15pt;
 	color: #666;
 }
+
+
 
 h2 {
 	font-size: 18pt;

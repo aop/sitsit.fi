@@ -1,23 +1,25 @@
-﻿<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/> 
-</head>
+﻿{{extend 'sitsilayout.html'}}
 
-<body>
+<div class="container_12 middle">
+	<div class="grid_12">
+		<h2>Liity tästä sitseille!</h2>
+	</div>
+	<div class="clear"></div>
+</div>
 
-<p>
+<div class="container_12 content">
+	<div class="grid_4">
+		<h2>Liity</h2>
+		{{if form:}}
+		{{=form}}
+		{{else:}}
+		You are already attending. <a href="{{=URL('default','sitsit',args=request.args[0])}}">Back</a>
+		{{pass}}
+	</div>
 
-Hei{{if auth.user:}}, {{=auth.user.first_name}}{{pass}}!
+	<div class="clear"></div>
+</div>
 
-Tervetuloa sitsit.fi-palveluun, vasymattomaan partygeneraattoriisi
-</p>
-<p>
-	Liity tästä sitseille!
-</p>
 
-{{if form:}}
-{{=form}}
-{{else:}}
-You are already attending
-{{pass}}
 
 </body> 

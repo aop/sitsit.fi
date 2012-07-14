@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<title>sitsit.fi</title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+<head>
+{{
+  response.files.append(URL('static','css/reset.css'))
+  response.files.append(URL('static','css/text.css'))
+  response.files.append(URL('static','css/960.css'))
+  response.files.append(URL('static','css/sitsit.css'))
+  response.files.append(URL('static','css/calendar.css'))
+  response.files.append(URL('static','js/calendar.js'))
+  response.files.append(URL('static','js/web2py.js'))
+  response.files.insert(0,URL('static','js/jquery.js'))
+  }}
+{{
+response.include_meta()
+response.include_files()
+}}
+
+
+</head>
+</head>
+<body>
+
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : 'YOUR_APP_ID', // App ID
+      channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      xfbml      : true  // parse XFBML
+    });
+
+    // Additional initialization code here
+  };
+
+  // Load the SDK Asynchronously
+  (function(d){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     ref.parentNode.insertBefore(js, ref);
+   }(document));
+</script>
+
+<div id="top"></div>
+
+<div class="container_12 header">
+	<div class="grid_2 suffix_4">
+		<a href="{{=URL('default','index')}}"><img id="logo" src="{{=URL('static','img/logo.png')}}" alt="sitsit.fi logo" /></a>
+	</div>
+	<div class="grid_6">
+	{{if not auth.user:}}
+		<!--<form style="float:left;">
+			<input type="text"></input>
+		</form>
+		-->
+		<div style="float:left">
+		{{=loginform.custom.begin}}
+		{{=loginform.custom.widget.email}}
+		{{=loginform.custom.widget.password}}
+		{{=loginform.custom.submit}}
+		{{=loginform.custom.end}}
+		</div>
+		
+		<p>
+		Or
+		</p>
+		
+		<a style="float:left;" class="fb_button fb_button_small" href="https://www.facebook.com/dialog/oauth?
+			client_id={{=FB_APP_ID}}
+		   &redirect_uri={{=URL('default','fbregister',host=True)}}
+		   &scope=email
+		   &state={{=fb_token}}">
+			<span class="fb_button_text">Log In</span>
+		</a>
+	{{else:}}
+	<p >
+		Greetings, {{=auth.user.first_name}}
+	</p>
+	<a href="{{=URL('default','user',args='logout')}}">Logout</a>
+	{{pass}}
+	</div>
+	<div class="clear"></div>
+</div>
+
+{{include}}
+
+<div class="container_12 footer">
+	<div class="grid_12">
+		<p>tiimi@sitsit.fi</p>
+	</div>
+	<div class="clear"></div>
+</div>
+</body>
+</html>

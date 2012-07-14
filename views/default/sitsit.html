@@ -1,11 +1,114 @@
-<html>
-<head>
-	{{
-	response.files.insert(0,URL('static','js/jquery.js'))
-	response.include_files()
-	}}
-</head>
-<body>
+﻿{{extend 'sitsilayout.html'}}
+
+<script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+<script type="text/javascript">
+
+      var map = null;
+      function getMap()
+      {
+        map = new Microsoft.Maps.Map(document.getElementById('map'), {credentials: 'AjAykFUOyuIFa5I5gf0g49_NZO4sYtG8TeVJfg2pesqGFqittfHnwpuUEw6zAoa6', center: new Microsoft.Maps.Location(47.609771, -122.2321543125), zoom: 8,showDashboard: false});
+		map.entities.clear(); 
+		var pushpin= new Microsoft.Maps.Pushpin(map.getCenter(), null);
+		map.entities.push(pushpin);
+		
+		var query= '{{=sitsi['place']}}'; 
+		map.getCredentials(function(credentials) {
+			var searchRequest = 'http://dev.virtualearth.net/REST/v1/Locations/' + query + '?output=json&jsonp=SearchServiceCallback&key=' + credentials;
+			var mapscript = document.createElement('script'); 
+			mapscript.type = 'text/javascript'; 
+			mapscript.src = searchRequest; 
+			document.getElementById('map').appendChild(mapscript); 
+		});
+      }
+	  
+	  function SearchServiceCallback(result)
+      {
+          var output = document.getElementById("output");
+          if (output)
+          {
+              while (output.hasChildNodes()) {
+                  output.removeChild(output.lastChild); 
+              }
+          }
+          var resultsHeader = document.createElement("h5");
+          output.appendChild(resultsHeader);
+
+          if (result &&
+          result.resourceSets &&
+          result.resourceSets.length > 0 &&
+          result.resourceSets[0].resources &&
+          result.resourceSets[0].resources.length > 0) 
+          {
+              //resultsHeader.innerHTML = "Bing Maps REST Search API  <br/>  Found location " + result.resourceSets[0].resources[0].name;
+              var bbox = result.resourceSets[0].resources[0].bbox;
+              var viewBoundaries = Microsoft.Maps.LocationRect.fromLocations(new Microsoft.Maps.Location(bbox[0], bbox[1]), new Microsoft.Maps.Location(bbox[2], bbox[3]));
+              map.setView({ bounds: viewBoundaries});
+              var location = new Microsoft.Maps.Location(result.resourceSets[0].resources[0].point.coordinates[0], result.resourceSets[0].resources[0].point.coordinates[1]);
+              var pushpin = new Microsoft.Maps.Pushpin(location);
+              map.entities.push(pushpin);
+          }
+          else
+          {
+              if (typeof (response) == 'undefined' || response == null)
+              {
+                  //alert("Invalid credentials or no response");
+              }
+              else 
+              {
+                  if (typeof (response) != 'undefined' && response && result && result.errorDetails)
+                  {
+                      //resultsHeader.innerHTML = "Message :"  + response.errorDetails[0];
+					  document.getElementById('map').height = 0;
+                  }
+                      //alert("No results for the query");
+              }
+          }
+      }
+
+
+	  {{if sitsi['showmap']:}}
+	  $(document).ready(function(){getMap()});
+	  {{pass}}
+      </script>
+
+
+
+<div class="container_12 middle">
+	<div class="grid_12">
+		<h2>{{if not found:}}
+Sitsejä ei valitettavasti löytynyt
+{{else:}}
+{{=sitsi['name']}}
+{{pass}}
+</h2>
+	</div>
+	<div class="clear"></div>
+</div>
+
+<div class="container_12 content">
+	<div class="grid_4">
+		<h2>Info</h2>
+		<p>Nimi: {{=sitsi['name']}}</p>
+		<p>Osallistujat: {{=sitsi['numofattending']}}/{{=sitsi['numofseats']}}</p>
+		<p>Julkisuus: {{if sitsi['secrecy']=="public":}}Julkinen{{elif sitsi['secrecy']=="link":}}Linkin saaneille{{else:}}salainen{{pass}}</p>
+		<p>Ajankohta: {{=sitsi['starttime']}}</p>
+		<p>{{if attending:}}
+			<b>Osallistut jo! </b><a href="#">Peru ilmoittautuminen</a>
+			{{else:}}
+			<a href="{{=URL('default','join',args=sitsi['id'])}}">Join</a>
+			{{pass}}
+		</p>
+	</div>
+	<div class="grid_8">
+		<h2>Sijainti</h2>
+		<p class="map">Paikka: {{=sitsi['place']}}</p>
+		<div id="output"></div>
+		<p><div id='map' style="position:relative; width:400px; height:300px;"></div></p>
+	</div>
+
+	<div class="clear"></div>
+</div>
+
 {{if not found:}}
 Ei loytyny
 {{else:}}
@@ -36,6 +139,3 @@ You already attend
 {{pass}}
 {{pass}}
 
-</body>
-
-</html>

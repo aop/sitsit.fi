@@ -87,12 +87,13 @@ import datetime
 
 db.define_table("party",
 	Field("name",length=512),
-	Field("starttime","datetime"),
+	Field("starttime","datetime",widget=SQLFORM.widgets.datetime.widget),
 	Field("numofseats","integer"),
-	Field("numofattending","integer"),
+	Field("numofattending","integer",default=0),
 	Field("place"),
+	Field("showmap","boolean"),
 	Field("owner",db.auth_user),
-	Field("secrecy") #Either 'public', 'link' or 'invite'
+	Field("secrecy",requires=IS_IN_SET(['public','link','invite'])) #Either 'public', 'link' or 'invite'
 	)
 	
 db.define_table("invite",
