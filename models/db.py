@@ -130,3 +130,7 @@ db.define_table("fb_auth_tokens",
 	Field("expires","datetime")
 	)
 
+db.define_table("fb_state_tokens",
+	Field("token"),
+	Field("expires","datetime",default=(datetime.datetime.now()+datetime.timedelta(hours=1)))
+	)

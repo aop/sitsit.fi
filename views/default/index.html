@@ -1,35 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/> 
-</head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<title>sitsit.fi</title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+<head>
+{{
+  response.files.append(URL('static','css/reset.css'))
+  response.files.append(URL('static','css/text.css'))
+  response.files.append(URL('static','css/960.css'))
+  response.files.append(URL('static','css/sitsit.css'))
 
+  }}
+{{
+response.include_meta()
+response.include_files()
+}}
+
+
+</head>
+</head>
 <body>
 
-<p>
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : 'YOUR_APP_ID', // App ID
+      channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel File
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      xfbml      : true  // parse XFBML
+    });
 
-Hei{{if auth.user:}}, {{=auth.user.first_name}}{{pass}}!
+    // Additional initialization code here
+  };
 
-Tervetuloa sitsit.fi-palveluun, vasymattomaan partygeneraattoriisi
-</p>
+  // Load the SDK Asynchronously
+  (function(d){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     ref.parentNode.insertBefore(js, ref);
+   }(document));
+</script>
 
-{{if not auth.user:}}
-<a href="{{=URL('default','user',args='register')}}">register</a> or 
-<a href="https://www.facebook.com/dialog/oauth?
-    client_id={{=FB_APP_ID}}
-   &redirect_uri={{=URL('default','fbregister',host=True)}}
-   &scope=email
-   &state={{=response.session_id[response.session_id.find(":")+1:]}}">FB-register/login</a>
-<br />
-<a href="{{=URL('default','user',args='login')}}">Login</a>
-{{pass}}
+<div id="top"></div>
 
+<div class="container_12 header">
+	<div class="grid_2 suffix_4">
+		<img id="logo" src="{{=URL('static','img/logo.png')}}" alt="sitsit.fi logo" />
+	</div>
+	<div class="grid_6">
+	{{if not auth.user:}}
+		<!--<form style="float:left;">
+			<input type="text"></input>
+		</form>
+		-->
+		<div style="float:left">
+		{{=form.custom.begin}}
+		{{=form.custom.widget.email}}
+		{{=form.custom.widget.password}}
+		{{=form.custom.submit}}
+		{{=form.custom.end}}
+		</div>
+		
+		<p>
+		Or
+		</p>
+		
+		<a style="float:left;" class="fb_button fb_button_small" href="https://www.facebook.com/dialog/oauth?
+			client_id={{=FB_APP_ID}}
+		   &redirect_uri={{=URL('default','fbregister',host=True)}}
+		   &scope=email
+		   &state={{=fb_token}}">
+			<span class="fb_button_text">Log In</span>
+		</a>
+	{{else:}}
+	<p >
+		Greetings, {{=auth.user.first_name}}
+	</p>
+	<a href="{{=URL('default','user',args='logout')}}">Logout</a>
+	{{pass}}
+	</div>
+	<div class="clear"></div>
+</div>
 
-<a href="{{=URL('default','sitsit')}}">Lisaa bileet</a>
+<div class="container_12 middle">
+	<div class="grid_12">
+		<h2>Sitsijuhlien Älykäs Optimointipalvelu, jotta helan går ja alla får!</h2>
+	</div>
+	<div class="clear"></div>
+</div>
 
-<a href="{{=URL('default','user',args='logout')}}">Logout</a>
+<div class="container_12 content">
+	<div class="grid_4">
+		<h2>Palvelu</h2>
+		<p>Sitsit.fi tarjoaa perinteisten sitsijuhlien älykästä optimointipalvelua jolla maksimoit jokaisen sitsin potentiaalin luoda ikuisia muistoja ja kestäviä ystävyyksiä. </p>
+		<p>Palvelun toteuttaa neljän Aalto-yliopiston opiskelijan tiimi viikonlopun 25.9.-26.9. aikana. Tällä sivulla voit antaa palautetta ja seurata projektin etenemistä.</p>
+		<p>Tiimiin saat parhaiten yhteyden <a href="http://www.facebook.com/pages/sitsitfi/156410581055131">Facebook-sivumme</a> kautta</p>
+	</div>
+	<div class="grid_4">
+		<h2>Kysely</h2>
+		<p>Mikä sitseillä ärsyttää? Entä mikä on järjestämisesä vaikeinta? Keräämme sitsikansalta palautetta, jotta voimme kehittää palvelusta parhaan mahdollisen. Vastaamalla alla oleviin kyselyihin autat meitä ja osallistut yllätyspalkintojen arvontaan!</p>
+		<p>Sitsaajille: <a href="http://bit.ly/b8O7Sg">bit.ly/b8O7Sg</a>
+		<p>Järjestäjille: <a href="http://bit.ly/b8O7Sg">bit.ly/b8O7Sg</a>
+	</div>
+	<div class="grid_4">
+		<p><iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2Fsitsitfi%2F156410581055131&amp;width=300&amp;connections=5&amp;stream=true&amp;header=true&amp;height=250" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:250px;" allowTransparency="true"></iframe></p>
+		<p>Voit myös seurata meitä Twitterissä: <a href="http://twitter.com/sitsiparty">www.twitter.com/sitsiparty</a>.
+	</div>
+	<div class="clear"></div>
+</div>
 
-<p>Tassa kaikki bileet:</p>
-{{for i,party in enumerate(parties):}}
-<p>{{=(i+1)}}: <a href="{{=URL('default','sitsit',args=party.id)}}">{{=party.name}}</a></p>
-{{pass}}
-
-</body> 
+<div class="container_12 footer">
+	<div class="grid_12">
+		<p>tiimi@sitsit.fi</p>
+	</div>
+	<div class="clear"></div>
+</div>
+</body>
+</html>

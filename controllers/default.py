@@ -16,7 +16,12 @@ def index():
 	"""
 	response.flash = "Welcome to web2py!"
 	sitsit=db().select(db.party.ALL)
-	return dict(message=T('Hello World'),parties=sitsit)
+	import uuid
+	fb_token=uuid.uuid4()
+	db(db.fb_state_tokens.expires > datetime.datetime.now()).delete()
+	db.fb_state_tokens.insert(token=fb_token)
+	form=auth.login()
+	return dict(message=T('Hello World'),parties=sitsit,fb_token=fb_token,form=form)
 
 
 def sitsit(): 
@@ -105,7 +110,7 @@ def user_attending(partyid,userid):
 def fbregister():
 	state = request.vars.state
 	#check state for hacking
-	if state != response.session_id[response.session_id.find(":")+1:]:
+	if db(db.fb_state_tokens.token == state).select().first() == None:
 		raise HTTP(403, "Hacking attempt")
 
 	#for error:
@@ -127,13 +132,33 @@ def fbregister():
 	# &redirect_uri=YOUR_REDIRECT_URI
 	# &client_secret=YOUR_APP_SECRET
 	# &code=CODE_GENERATED_BY_FACEBOOK
-	import urllib
-	resp = urllib.urlopen("https://graph.facebook.com/oauth/access_token?client_id="+str(FB_APP_ID)+"&redirect_uri="+URL('default','fbregister',host=True)+"&client_secret="+FB_APP_SECRET+"&code="+code).read()
+	oauthURL = "https://graph.facebook.com/oauth/access_token?client_id="+str(FB_APP_ID)+"&redirect_uri="+URL('default','fbregister',host=True)+"&client_secret="+FB_APP_SECRET+"&code="+code
+	if not request.env.web2py_runtime_gae:
+		import urllib2
+		resp = urllib2.urlopen(oauthURL).read()
+	else:
+		from google.appengine.api import urlfetch
+		result = urlfetch.fetch(oauthURL)
+		if result.status_code == 200:
+			resp = result.content
+		else:
+			raise HTTP(500,"FB register problem")
 	import urlparse
 	resp_decoded=urlparse.parse_qs(resp)
-	access_token=resp_decoded['access_token'][0]
+	try:
+		access_token=resp_decoded['access_token'][0]
+	except:
+		return str(resp)+" -> "+str(resp_decoded)
 	# Load data from fb and register if not yet registered
-	fb_resp_raw = urllib.urlopen("https://graph.facebook.com/me?access_token="+access_token).read()
+	fbGraphURL = "https://graph.facebook.com/me?access_token="+access_token
+	if not request.env.web2py_runtime_gae:
+		fb_resp_raw = urllib2.urlopen(fbGraphURL).read()
+	else:
+		result = urlfetch.fetch(fbGraphURL)
+		if result.status_code == 200:
+			fb_resp_raw = result.content
+		else:
+			raise HTTP(500,"FB register problem")
 	import json
 	fb_resp=json.loads(fb_resp_raw)
 	email = fb_resp['email']

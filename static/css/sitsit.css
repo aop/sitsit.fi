@@ -1,0 +1,82 @@
+div#top {
+	width: 100%; 
+	background: #ddd; 
+	height: 60px; 
+	position: absolute; 
+	z-index: -1;
+}
+
+.header {
+	margin-bottom: 30px;
+}
+
+.header p {
+	margin-top: 10px;
+	margin-left: 10px;
+	float:left;
+}
+
+.header a {
+	float: left;
+	margin-top: 10px;
+	margin-left: 15px;
+}
+
+.middle {
+	border-top: 2px dashed #ddd;
+	border-bottom: 2px dashed #ddd;
+	text-align: center;
+	padding: 30px 0;
+	margin-bottom: 30px;
+}
+
+.content {
+	border-bottom: 1px dashed #ccc;
+	padding-bottom: 10px;
+}
+
+input {
+	display: block;
+}
+
+p {
+	font-size: 11pt;
+	font-family: Helvetica;
+	line-height: 15pt;
+	color: #666;
+}
+
+h2 {
+	font-size: 18pt;
+	font-family: Georgia;
+	color: #600;
+	font-wight: bold;
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	color: #33c;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #99d;
+}
+
+.content h2 {
+	font-size: 15pt;
+	margin-bottom: 20px;
+}
+
+.footer {
+	padding: 10px 0 20px 0;
+}
+
+.footer p {
+	float: right;
+	font-size: 10pt;
+	color: #888;
+	font-weight: regular;
+}
+	

@@ -1,0 +1,23 @@
+﻿<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/> 
+</head>
+
+<body>
+
+<p>
+
+Hei{{if auth.user:}}, {{=auth.user.first_name}}{{pass}}!
+
+Tervetuloa sitsit.fi-palveluun, vasymattomaan partygeneraattoriisi
+</p>
+<p>
+	Liity tästä sitseille!
+</p>
+
+{{if form:}}
+{{=form}}
+{{else:}}
+You are already attending
+{{pass}}
+
+</body> 
