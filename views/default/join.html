@@ -13,7 +13,7 @@
 		{{if form:}}
 		{{=form}}
 		{{else:}}
-		You are already attending. <a href="{{=URL('default','sitsit',args=request.args[0])}}">Back</a>
+		{{=msg}}<a href="{{=URL('default','sitsit',args=request.args[0])}}">Back</a>
 		{{pass}}
 	</div>
 

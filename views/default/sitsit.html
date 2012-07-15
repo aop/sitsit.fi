@@ -93,7 +93,7 @@ Sitsejä ei valitettavasti löytynyt
 		<p>Julkisuus: {{if sitsi['secrecy']=="public":}}Julkinen{{elif sitsi['secrecy']=="link":}}Linkin saaneille{{else:}}salainen{{pass}}</p>
 		<p>Ajankohta: {{=sitsi['starttime']}}</p>
 		<p>{{if attending:}}
-			<b>Osallistut jo! </b><a href="#">Peru ilmoittautuminen</a>
+			<b>Osallistut jo! </b><a href="{{=URL('default','dejoin',args=sitsi['id'])}}">Peru ilmoittautuminen</a>
 			{{else:}}
 			<a href="{{=URL('default','join',args=sitsi['id'])}}">Join</a>
 			{{pass}}
