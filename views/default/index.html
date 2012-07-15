@@ -1,30 +1,32 @@
 ﻿{{extend 'sitsilayout.html'}}
 
-
-<div class="container_12 middle">
-	<div class="grid_12">
-		<h2>Sitsijuhlien Älykäs Optimointipalvelu, jotta helan går ja alla får!</h2>
+<div class="page-header" style="padding-top: 40px;">
+	<div class="container">
+		<h1>Sitsijuhlien Älykäs Optimointipalvelu, jotta helan går ja alla får!</h1>
 	</div>
-	<div class="clear"></div>
 </div>
 
-<div class="container_12 content">
-	<div class="grid_4">
-		<h2>Palvelu</h2>
-		<p>Sitsit.fi tarjoaa perinteisten sitsijuhlien älykästä optimointipalvelua jolla maksimoit jokaisen sitsin potentiaalin luoda ikuisia muistoja ja kestäviä ystävyyksiä. </p>
-		<p>Palvelun toteuttaa neljän Aalto-yliopiston opiskelijan tiimi viikonlopun 25.9.-26.9. aikana. Tällä sivulla voit antaa palautetta ja seurata projektin etenemistä.</p>
-		<p>Tiimiin saat parhaiten yhteyden <a href="http://www.facebook.com/pages/sitsitfi/156410581055131">Facebook-sivumme</a> kautta</p>
+<div class="container">
+	<div class="row-fluid">
+		<div class="span4">
+			<h2>Palvelu</h2>
+			<p>Sitsit.fi tarjoaa perinteisten sitsijuhlien älykästä optimointipalvelua jolla maksimoit jokaisen sitsin potentiaalin luoda ikuisia muistoja ja kestäviä ystävyyksiä. </p>
+			<p>Palvelun toteuttaa neljän Aalto-yliopiston opiskelijan tiimi viikonlopun 25.9.-26.9. aikana. Tällä sivulla voit antaa palautetta ja seurata projektin etenemistä.</p>
+			<p>Tiimiin saat parhaiten yhteyden <a href="http://www.facebook.com/pages/sitsitfi/156410581055131">Facebook-sivumme</a> kautta</p>
+		</div>
+
+		<div class="span4">
+			<h2>Tulevia sitsejä</h2>
+			{{for i,party in enumerate(parties):}}
+				<p>{{=(i+1)}}: <a href="{{=URL('default','sitsit',args=party.id)}}">{{=party.name}}</a> paikassa {{=party.place}}</p>
+			{{pass}}
+			<p><a href="{{=URL('default','sitsit')}}">Lisää bileet</a></p>
+		</div>
+
+		<div class="span4">
+			<p><iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2Fsitsitfi%2F156410581055131&amp;width=300&amp;connections=5&amp;stream=true&amp;header=true&amp;height=250" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:250px;" allowTransparency="true"></iframe></p>
+			<p>Voit myös seurata meitä Twitterissä: <a href="http://twitter.com/sitsiparty">www.twitter.com/sitsiparty</a>.
+		</div>
+
 	</div>
-	<div class="grid_4">
-		<h2>Tulevia sitsejä</h2>
-		{{for i,party in enumerate(parties):}}
-			<p>{{=(i+1)}}: <a href="{{=URL('default','sitsit',args=party.id)}}">{{=party.name}}</a> paikassa {{=party.place}}</p>
-		{{pass}}
-		<p><a href="{{=URL('default','sitsit')}}">Lisää bileet</a></p>
-	</div>
-	<div class="grid_4">
-		<p><iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2Fsitsitfi%2F156410581055131&amp;width=300&amp;connections=5&amp;stream=true&amp;header=true&amp;height=250" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:300px; height:250px;" allowTransparency="true"></iframe></p>
-		<p>Voit myös seurata meitä Twitterissä: <a href="http://twitter.com/sitsiparty">www.twitter.com/sitsiparty</a>.
-	</div>
-	<div class="clear"></div>
 </div>
