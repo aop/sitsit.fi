@@ -68,6 +68,16 @@ def joinAJAX():
 		return "Successfully joined "+ auth.user.first_name + " on sitsi nro: "+request.vars.id
 	return "False"
 	
+@auth.requires_login()
+def dejoin():
+	if not request.args or not request.args[0].isdigit() or not db.party[request.args[0]]:
+		raise HTTP(404)
+	party = request.args[0]
+	db((db.guest_party_attending.party == party) & (db.guest_party_attending.guest == auth.user.id)).delete()
+	db(db.party.id == party).update(numofattending=db.party.numofattending-1)
+	db((db.party_answer.party == party) & (db.party_answer.guest == auth.user.id)).delete()
+	return dict(msg="Successfully unjoind")
+	
 def join():
 	if not request.args or not request.args[0].isdigit() or not db.party[request.args[0]]:
 		raise HTTP(404)
@@ -83,6 +93,16 @@ def join():
 			raise HTTP(403)
 	questions = db(db.party_question.party==sitsi.id).select()
 	question_list_for_form = l =[]
+	if auth.is_logged_in():
+		l.append(LABEL("Name:"))
+		l.append(INPUT(_name="name",requires=IS_NOT_EMPTY(),value=(auth.user.first_name+" "+auth.user.last_name)))
+		l.append(LABEL("Email:"))
+		l.append(INPUT(_name="email",requires=IS_NOT_EMPTY(),type="email",value=auth.user.email))
+	else:
+		l.append(LABEL("Name:"))
+		l.append(INPUT(_name="name",requires=IS_NOT_EMPTY()))
+		l.append(LABEL("Email:"))
+		l.append(INPUT(_name="email",requires=IS_NOT_EMPTY(),type="email"))
 	for q in questions:
 		tmp = []
 		if q.type == "question":
@@ -103,21 +123,40 @@ def join():
 		l.append(div)
 	l.append(INPUT(_type="submit",value="Join"))
 	form = FORM(*l)
-	if user_attending(request.args[0],auth.user.id):
+	msg=""
+	if (auth.user and user_attending(request.args[0],auth.user.id)) or unregistered_user_attending(request.args[0],request.vars.email):
 		form = None
+		msg ="You already attend."
 	def check_user(form):
+		#check that isn't already attending
 		if not auth.is_logged_in():
 			form.errors.user = "Not logged in"
-	if form and form.validate(onvalidation=check_user):
-		for q in form.vars.keys():
-			db.party_answer.insert(question=q,answer=form.vars[q],guest=auth.user.id)
-		db.guest_party_attending.insert(party=request.args[0],guest=auth.user.id)
+	if form and form.validate():
+		if not auth.is_logged_in():
+			newuser = auth.get_or_create_user(dict(email=request.vars.email,first_name=form.vars.name))
+		for q in [keys for keys in form.vars.keys() if keys not in ['email','name']]:
+			if auth.is_logged_in():
+				db.party_answer.insert(question=q,answer=form.vars[q],guest=auth.user.id)
+			else:
+				db.party_answer.insert(question=q,answer=form.vars[q],guest=newuser.id)
+		if auth.is_logged_in():
+			db.guest_party_attending.insert(party=request.args[0],guest=auth.user.id)
+		else:
+			db.guest_party_attending.insert(party=request.args[0],guest=newuser.id)
 		db(db.party.id==request.args[0]).update(numofattending=db.party.numofattending+1)
-		return redirect(URL('default','sitsit',args=request.args[0]))
-	return dict(form=form)
+		return dict(form=None,msg="Successfully joined.",**getLayoutVars())
+	return dict(form=form,msg=msg,**getLayoutVars())
 	
 def user_attending(partyid,userid):
 	if db((db.guest_party_attending.party==partyid) & (db.guest_party_attending.guest==userid)).select().first():
+		return True
+	return False
+	
+def unregistered_user_attending(partyid,email):
+	user = db(db.auth_user.email == email).select().first()
+	if not user:
+		return False
+	if db((db.guest_party_attending.party==partyid) & (db.guest_party_attending.guest==user.id)).select().first():
 		return True
 	return False
 	

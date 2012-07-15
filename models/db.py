@@ -93,7 +93,8 @@ db.define_table("party",
 	Field("place"),
 	Field("showmap","boolean"),
 	Field("owner",db.auth_user),
-	Field("secrecy",requires=IS_IN_SET(['public','link','invite'])) #Either 'public', 'link' or 'invite'
+	Field("secrecy",requires=IS_IN_SET(['public','link','invite'])), #Either 'public', 'link' or 'invite'
+	Field("guestlistsecrecy",requires=IS_IN_SET(['public','link','invite']))
 	)
 	
 db.define_table("invite",
@@ -111,6 +112,7 @@ db.define_table("party_question",
 	
 	
 db.define_table("party_answer",
+	Field("party",db.party),
 	Field("question",db.party_question),
 	Field("answer"),
 	Field("guest",db.auth_user),
