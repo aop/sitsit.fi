@@ -94,35 +94,45 @@ db.define_table("party",
 	Field("showmap","boolean"),
 	Field("owner",db.auth_user),
 	Field("secrecy",requires=IS_IN_SET(['public','link','invite'])), #Either 'public', 'link' or 'invite'
-	Field("guestlistsecrecy",requires=IS_IN_SET(['public','link','invite']))
+	Field("guestlistsecrecy",requires=IS_IN_SET(['public','link','invite'])),
+	format = '%(name)s, %(place)s'
 	)
+#db.auth_user.id.represent = lambda id, row: db.auth_user[id].email if id!=None else 'N/A'
 	
 db.define_table("invite",
 	Field("email"),
 	Field("party",db.party)
 	)
 	
-db.define_table("party_question",
-	Field("party",db.party),
-	Field("type"), #Either question or select
-	Field("question"),
-	Field("choises","list:string"),
-	Field("required","boolean")
-	)
+# db.define_table("party_question",
+	# Field("party",db.party),
+	# Field("type"), #Either question or select
+	# Field("question"),
+	# Field("choises","list:string"),
+	# Field("required","boolean")
+	# )
 	
 	
-db.define_table("party_answer",
-	Field("party",db.party),
-	Field("question",db.party_question),
-	Field("answer"),
-	Field("guest",db.auth_user),
-	Field("answertime","datetime",default=datetime.datetime.now())
-	)
+# db.define_table("party_answer",
+	# Field("party",db.party),
+	# Field("question",db.party_question),
+	# Field("answer"),
+	# Field("guest",db.auth_user),
+	# Field("answertime","datetime",default=datetime.datetime.now())
+	# )
 	
 db.define_table("guest_party_attending",
-	Field("party",db.party),
-	Field("guest",db.auth_user)
+	Field("party",db.party,writable=False),
+	Field("guest",db.auth_user,writable=False),
+	Field("avec","string"),
+	Field("tablewish","string"),
+	Field("maindishdrink",requires=IS_IN_SET(['red','white','non-alcoholic'])),
+	Field("dessertdishdrink",requires=IS_IN_SET(['punch','jallu','non-alcoholic'])),
+	Field("restrictions"),
+	Field("other") #Totally open field
 	)
+#import pdb;pdb.set_trace()
+db.guest_party_attending.guest.represent=  lambda id, row: db.auth_user._format % db.auth_user[id] if id!=None else 'N/A'
 	
 db.define_table("actions",
 	)

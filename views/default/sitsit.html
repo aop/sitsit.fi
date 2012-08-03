@@ -112,10 +112,27 @@ Sitsejä ei valitettavasti löytynyt
 {{if not found:}}
 Ei loytyny
 {{else:}}
+<h2>Osallistujat</h2>
 {{if owner:}}
-	{{=BEAUTIFY(sitsi)}}
-	{{=BEAUTIFY(people)}}
+	{{=SQLTABLE(people,columns=['guest_party_attending.guest',
+								'guest_party_attending.avec',
+								'guest_party_attending.tablewish',
+								'guest_party_attending.maindishdrink',
+								'guest_party_attending.dessertdishdrink',
+								'guest_party_attending.restrictions',
+								'guest_party_attending.other'],
+						headers={'guest_party_attending.guest':"Nimi",
+								'guest_party_attending.avec':"Avec",
+								'guest_party_attending.tablewish':"Pöytätoive",
+								'guest_party_attending.maindishdrink':"Pääjuoma",
+								'guest_party_attending.dessertdishdrink':"Jälkiruokajuoma",
+								'guest_party_attending.restrictions':"Allergiat, rajoitukset",
+								'guest_party_attending.other':"Muuta"},
+						_class="attending_table"
+								)
+	}}
 {{pass}}
+<br />
 {{if auth.user:}}
 <script type="text/javascript">
 function attend(){
