@@ -47,7 +47,9 @@ def sitsit():
 	if len(request.args):
 		sitsiID = request.args[0]
 		sitsi = db.party[sitsiID]
-		people = db(db.guest_party_attending.party == sitsiID).select()#.as_dict()
+		people = db(db.guest_party_attending.party == sitsiID).select().as_dict()
+		for k,v in people.items():
+			people[k]['guest'] = db.auth_user[v['guest']]
 		owner=False
 		if auth.is_logged_in():
 			if auth.user.id == sitsi.owner:

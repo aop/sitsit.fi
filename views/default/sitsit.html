@@ -113,24 +113,23 @@ Sitsejä ei valitettavasti löytynyt
 Ei loytyny
 {{else:}}
 <h2>Osallistujat</h2>
-{{if owner:}}
-	{{=SQLTABLE(people,columns=['guest_party_attending.guest',
-								'guest_party_attending.avec',
-								'guest_party_attending.tablewish',
-								'guest_party_attending.maindishdrink',
-								'guest_party_attending.dessertdishdrink',
-								'guest_party_attending.restrictions',
-								'guest_party_attending.other'],
-						headers={'guest_party_attending.guest':"Nimi",
-								'guest_party_attending.avec':"Avec",
-								'guest_party_attending.tablewish':"Pöytätoive",
-								'guest_party_attending.maindishdrink':"Pääjuoma",
-								'guest_party_attending.dessertdishdrink':"Jälkiruokajuoma",
-								'guest_party_attending.restrictions':"Allergiat, rajoitukset",
-								'guest_party_attending.other':"Muuta"},
-						_class="attending_table"
-								)
-	}}
+{{if owner or sitsi['guestlistsecrecy'] == 'public':}}
+	<table border=2>
+	<tr><td>#</td><td>Name</td><td>Avec</td><td>Tablewish</td><td>Main drink</td><td>Dessert drink</td><td>Food restdictions</td><td>Other</td></tr>
+	{{for i,p in enumerate(people):
+	p = people[p]}}
+	<tr><td>{{=i}}</td><td>{{=p['guest']['last_name']}}, {{=p['guest']['first_name']}}</td><td>{{=p['avec']}}</td><td>{{=p['tablewish']}}</td><td>{{=p['maindishdrink']}}</td><td>{{=p['dessertdishdrink']}}</td><td>{{=p['restrictions']}}</td><td>{{=p['other']}}</td></tr>
+	{{pass}}
+	</table>
+	{{if sitsi['guestlistsecrecy'] == 'public':}}
+	Guestlist is public
+	{{elif sitsi['guestlistsecrecy'] == 'link':}}
+	Only people with link see guests
+	{{else:}}
+	Only admins see list
+	{{pass}}
+{{else:}}
+Only owners can see people attending
 {{pass}}
 <br />
 {{if auth.user:}}
