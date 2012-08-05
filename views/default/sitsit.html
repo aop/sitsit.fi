@@ -111,10 +111,26 @@
 {{if not found:}}
 Ei loytyny
 {{else:}}
-{{if owner:}}
-	{{=BEAUTIFY(sitsi)}}
-	{{=BEAUTIFY(people)}}
+<h2>Osallistujat</h2>
+{{if owner or sitsi['guestlistsecrecy'] == 'public':}}
+	<table border=2>
+	<tr><td>#</td><td>Name</td><td>Avec</td><td>Tablewish</td><td>Main drink</td><td>Dessert drink</td><td>Food restdictions</td><td>Other</td></tr>
+	{{for i,p in enumerate(people):
+	p = people[p]}}
+	<tr><td>{{=i}}</td><td>{{=p['guest']['last_name']}}, {{=p['guest']['first_name']}}</td><td>{{=p['avec']}}</td><td>{{=p['tablewish']}}</td><td>{{=p['maindishdrink']}}</td><td>{{=p['dessertdishdrink']}}</td><td>{{=p['restrictions']}}</td><td>{{=p['other']}}</td></tr>
+	{{pass}}
+	</table>
+	{{if sitsi['guestlistsecrecy'] == 'public':}}
+	Guestlist is public
+	{{elif sitsi['guestlistsecrecy'] == 'link':}}
+	Only people with link see guests
+	{{else:}}
+	Only admins see list
+	{{pass}}
+{{else:}}
+Only owners can see people attending
 {{pass}}
+<br />
 {{if auth.user:}}
 <script type="text/javascript">
 function attend(){

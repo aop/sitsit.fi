@@ -36,8 +36,9 @@ def sitsit():
 	if len(request.args) == 0:
 		if auth.is_logged_in():
 			response.view = "%s/%s.%s" % (request.controller, request.function+"new", request.extension) #sitsitnew.html
-			form = SQLFORM(db.party)
+			form = SQLFORM(db.party,_id="partyform")
 			request.post_vars.owner = auth.user.id
+			request.post_vars.numofattending=0
 			form.vars.owner = auth.user.id
 			if form.process().accepted:
 				return redirect(URL(args=form.vars.id))
@@ -47,6 +48,8 @@ def sitsit():
 		sitsiID = request.args[0]
 		sitsi = db.party[sitsiID]
 		people = db(db.guest_party_attending.party == sitsiID).select().as_dict()
+		for k,v in people.items():
+			people[k]['guest'] = db.auth_user[v['guest']]
 		owner=False
 		if auth.is_logged_in():
 			if auth.user.id == sitsi.owner:
@@ -75,7 +78,6 @@ def dejoin():
 	party = request.args[0]
 	db((db.guest_party_attending.party == party) & (db.guest_party_attending.guest == auth.user.id)).delete()
 	db(db.party.id == party).update(numofattending=db.party.numofattending-1)
-	db((db.party_answer.party == party) & (db.party_answer.guest == auth.user.id)).delete()
 	return dict(msg="Successfully unjoind")
 	
 def join():
@@ -91,38 +93,36 @@ def join():
 			redirect(auth.settings.login_url)
 		if not user_invited(auth.user):
 			raise HTTP(403)
-	questions = db(db.party_question.party==sitsi.id).select()
-	question_list_for_form = l =[]
-	if auth.is_logged_in():
-		l.append(LABEL("Name:"))
-		l.append(INPUT(_name="name",requires=IS_NOT_EMPTY(),value=(auth.user.first_name+" "+auth.user.last_name)))
-		l.append(LABEL("Email:"))
-		l.append(INPUT(_name="email",requires=IS_NOT_EMPTY(),type="email",value=auth.user.email))
+	db.guest_party_attending.party.readable=False
+	db.guest_party_attending.guest.readable=False
+	form_labels={
+	"restrictions":"Allergies or special food",
+	"maindishdrink":"Drink for main dish",
+	"dessertdishdrink":"Drink for dessert"
+	}
+	form = SQLFORM(db.guest_party_attending,labels=form_labels)
+	
+	
+	if auth.user:
+		form.vars.email = auth.user.email
+		form.vars.first_name = auth.user.first_name
+		form.vars.last_name = auth.user.last_name
+		email_element = TR(LABEL('Email:'), \
+							INPUT(_name='email',_disabled=True))
+		first_name_element = TR(LABEL('First name:'), \
+							INPUT(_name='first_name',_disabled=True))
+		last_name_element = TR(LABEL('Last name:'), \
+							INPUT(_name='last_name',_disabled=True))
 	else:
-		l.append(LABEL("Name:"))
-		l.append(INPUT(_name="name",requires=IS_NOT_EMPTY()))
-		l.append(LABEL("Email:"))
-		l.append(INPUT(_name="email",requires=IS_NOT_EMPTY(),type="email"))
-	for q in questions:
-		tmp = []
-		if q.type == "question":
-			if q.required:
-				tmp.append(INPUT(_name=q.id,requires=IS_NOT_EMPTY(),_class="question_text_required",required=True))
-			else:
-				tmp.append(INPUT(_name=q.id,_class="question_text",required=False))
-		if q.type == "select":
-			for c in q.choises:
-				if q.required:
-					tmp.append(INPUT(_name=q.id,_type='radio',_value=c,value="test",_class="question_radio_required"))
-				else:
-					tmp.append(INPUT(_name=q.id,_type='radio',_value=c,value="test",_class="question_radio"))
-				tmp.append(c)
-			#s = INPUT(_name=q.id,*[OPTION(c,_value=c) for c in q.choises])
-			#l.append(s)
-		div = DIV(q.question,_class="questiondiv",*tmp)
-		l.append(div)
-	l.append(INPUT(_type="submit",value="Join"))
-	form = FORM(*l)
+		email_element = TR(LABEL('Email:'), \
+							INPUT(_name='email'))
+		first_name_element = TR(LABEL('First name:'), \
+							INPUT(_name='first_name'))
+		last_name_element = TR(LABEL('Last name:'), \
+							INPUT(_name='last_name'))
+	form[0].insert(0,email_element)
+	form[0].insert(0,last_name_element)
+	form[0].insert(0,first_name_element)
 	msg=""
 	if (auth.user and user_attending(request.args[0],auth.user.id)) or unregistered_user_attending(request.args[0],request.vars.email):
 		form = None
@@ -132,17 +132,13 @@ def join():
 		if not auth.is_logged_in():
 			form.errors.user = "Not logged in"
 	if form and form.validate():
+		#If the user is not logged in. Create user with given email if that already exists connect attendance to that
 		if not auth.is_logged_in():
 			newuser = auth.get_or_create_user(dict(email=request.vars.email,first_name=form.vars.name))
-		for q in [keys for keys in form.vars.keys() if keys not in ['email','name']]:
-			if auth.is_logged_in():
-				db.party_answer.insert(question=q,answer=form.vars[q],guest=auth.user.id)
-			else:
-				db.party_answer.insert(question=q,answer=form.vars[q],guest=newuser.id)
 		if auth.is_logged_in():
-			db.guest_party_attending.insert(party=request.args[0],guest=auth.user.id)
+			db.guest_party_attending.insert(party=request.args[0],guest=auth.user.id,**db.guest_party_attending._filter_fields(form.vars))
 		else:
-			db.guest_party_attending.insert(party=request.args[0],guest=newuser.id)
+			db.guest_party_attending.insert(party=request.args[0],guest=newuser.id,**db.guest_party_attending._filter_fields(form.vars))
 		db(db.party.id==request.args[0]).update(numofattending=db.party.numofattending+1)
 		return dict(form=None,msg="Successfully joined.",**getLayoutVars())
 	return dict(form=form,msg=msg,**getLayoutVars())
