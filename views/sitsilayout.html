@@ -19,7 +19,7 @@ response.include_files()
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
 </head>
-<body>
+<body style="padding-top: 60px;">
 
 <div id="fb-root"></div>
 <script>
@@ -70,10 +70,10 @@ response.include_files()
 		</form>
 
 		{{else:}}
-		<p >
+		<p class="pull-right" style="margin: 0; line-height: 40px;">
 			Greetings, {{=auth.user.first_name}}
-		</p>
 		<a href="{{=URL('default','user',args='logout')}}">Logout</a>
+		</p>
 		{{pass}}
 	</div>
 	</div>

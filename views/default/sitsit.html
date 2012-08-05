@@ -73,40 +73,39 @@
 
 
 
-<div class="container_12 middle">
-	<div class="grid_12">
+<div class="page-header" style="padding-top: 40px;">
+	<div class="container">
 		<h2>{{if not found:}}
-Sitsejä ei valitettavasti löytynyt
-{{else:}}
-{{=sitsi['name']}}
-{{pass}}
-</h2>
+			Sitsejä ei valitettavasti löytynyt
+		{{else:}}
+			{{=sitsi['name']}}
+		{{pass}}
+		</h2>
 	</div>
-	<div class="clear"></div>
 </div>
 
-<div class="container_12 content">
-	<div class="grid_4">
-		<h2>Info</h2>
-		<p>Nimi: {{=sitsi['name']}}</p>
-		<p>Osallistujat: {{=sitsi['numofattending']}}/{{=sitsi['numofseats']}}</p>
-		<p>Julkisuus: {{if sitsi['secrecy']=="public":}}Julkinen{{elif sitsi['secrecy']=="link":}}Linkin saaneille{{else:}}salainen{{pass}}</p>
-		<p>Ajankohta: {{=sitsi['starttime']}}</p>
-		<p>{{if attending:}}
-			<b>Osallistut jo! </b><a href="{{=URL('default','dejoin',args=sitsi['id'])}}">Peru ilmoittautuminen</a>
-			{{else:}}
-			<a href="{{=URL('default','join',args=sitsi['id'])}}">Join</a>
-			{{pass}}
-		</p>
+<div class="container">
+	<div class="row-fluid">
+		<div class="span6">
+			<h2>Info</h2>
+			Nimi: {{=sitsi['name']}}
+			Osallistujat: {{=sitsi['numofattending']}}/{{=sitsi['numofseats']}}<br />
+			Julkisuus: {{if sitsi['secrecy']=="public":}}Julkinen{{elif sitsi['secrecy']=="link":}}Linkin saaneille{{else:}}salainen{{pass}}<br />
+			Ajankohta: {{=sitsi['starttime']}}<br />
+			{{if attending:}}
+				<b>Osallistut jo! </b><a href="{{=URL('default','dejoin',args=sitsi['id'])}}">Peru ilmoittautuminen</a>
+				{{else:}}
+				<a href="{{=URL('default','join',args=sitsi['id'])}}">Join</a>
+				{{pass}}
+			</p>
+		</div>
+		<div class="span6">
+			<h2>Sijainti</h2>
+			<p class="map">Paikka: {{=sitsi['place']}}</p>
+			<div id="output"></div>
+			<p><div id='map' style="position:relative; width:400px; height:300px;"></div></p>
+		</div>
 	</div>
-	<div class="grid_8">
-		<h2>Sijainti</h2>
-		<p class="map">Paikka: {{=sitsi['place']}}</p>
-		<div id="output"></div>
-		<p><div id='map' style="position:relative; width:400px; height:300px;"></div></p>
-	</div>
-
-	<div class="clear"></div>
 </div>
 
 {{if not found:}}

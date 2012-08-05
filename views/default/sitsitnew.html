@@ -88,31 +88,25 @@
       </script>
 
 
-<div class="container_12 middle">
-	<div class="grid_12">
-		<h2>Lisää uudet sitsit</h2>
+<div class="container">
+	<div class="row-fluid">
+		<div class="span6">
+			<form action="" enctype="multipart/form-data" method="post" class="form-horizontal">
+			Nimi: {{=form.custom.widget.name}}<br />
+			Aloitusaika: {{=form.custom.widget.starttime}}<br />
+			Paikkoja: {{=form.custom.widget.numofseats}}<br />
+			Sijainti: {{=form.custom.widget.place}}<br />
+			Näkyvyys: {{=form.custom.widget.secrecy}}<br />
+			Vieraslistan julkisuus: {{=form.custom.widget.guestlistsecrecy}}<br />
+			Näytä kartta: {{=form.custom.widget.showmap}}<br />
+			{{=form.custom.submit}}
+			{{=form.custom.end}}
+			{{=BEAUTIFY(form.errors)}}
+		</div>
+		<div class="span6">
+			<p id="searchText" style="float:left;"></p>
+			<div id="map" style="position: relative; float:right; height: 400px; width:600px;"></div>
+		</div>
 	</div>
-	<div class="clear"></div>
-</div>
-
-<div class="container_12 content">
-	<div class="grid_4">
-		{{=form.custom.begin}}
-		Nimi: {{=form.custom.widget.name}}
-		Aloitusaika: {{=form.custom.widget.starttime}}
-		Paikkoja: {{=form.custom.widget.numofseats}}
-		Sijainti: {{=form.custom.widget.place}}
-		Näkyvyys: {{=form.custom.widget.secrecy}}<br />
-		Vieraslistan julkisuus: {{=form.custom.widget.guestlistsecrecy}}
-		Näytä kartta: {{=form.custom.widget.showmap}}
-		{{=form.custom.submit}}
-		{{=form.custom.end}}
-		{{=BEAUTIFY(form.errors)}}
-	</div>
-	<div class="grid_8">
-		<p id="searchText" style="float:left;"></p>
-		<div id="map" style="position: relative; float:right; height: 400px; width:600px;"></div>
-	</div>
-	<div class="clear"></div>
 </div>
 

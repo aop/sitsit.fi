@@ -1,23 +1,16 @@
 ﻿{{extend 'sitsilayout.html'}}
 
-<div class="container_12 middle">
-	<div class="grid_12">
-		<h2>Liity tästä sitseille!</h2>
+<div class="container">
+	<div class="row-fluid">
+		<div class="span5">
+			<h2>Liity</h2>
+			{{if form:}}
+			{{=form}}
+			{{else:}}
+			{{=msg}}<a href="{{=URL('default','sitsit',args=request.args[0])}}">Back</a>
+			{{pass}}
+		</div>
 	</div>
-	<div class="clear"></div>
-</div>
-
-<div class="container_12 content">
-	<div class="grid_4">
-		<h2>Liity</h2>
-		{{if form:}}
-		{{=form}}
-		{{else:}}
-		{{=msg}}<a href="{{=URL('default','sitsit',args=request.args[0])}}">Back</a>
-		{{pass}}
-	</div>
-
-	<div class="clear"></div>
 </div>
 
 
