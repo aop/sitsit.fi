@@ -89,11 +89,10 @@ ssS'id'
 p32
 (dp33
 g4
-S'id'
-p34
+g32
 sg6
 I1
 sg7
 S'INTEGER PRIMARY KEY AUTOINCREMENT'
-p35
+p34
 ss.
