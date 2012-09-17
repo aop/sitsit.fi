@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 # this file is released under public domain and you can use without limitations
 
@@ -18,6 +19,26 @@ def index():
 	sitsit=db(db.party.secrecy=="public").select()
 	layoutvars = getLayoutVars()
 	return dict(message=T('Hello World'),parties=sitsit,**layoutvars)
+	
+def send_register_mail(user,password,usingFB=False):
+	extraText=""
+	if usingFB:
+		extraText="You can also log in with Facebook just like you registered"
+	msg = REGISTER_MAIL % ((user.first_name+" "+user.last_name),user.email,password,extraText)
+	send_mail(REGISTER_MAIL_SUBJECT,msg,user.email,SENDER_EMAIL)
+	
+def send_mail(subject,msg,address,sender):
+	import boto
+	conn = boto.connect_ses(
+        aws_access_key_id=AWS_ACCESS_KEY,
+        aws_secret_access_key=AWS_SECRET_KEY)
+	if type(address) != type([]):
+		address = [address]
+	conn.send_email(
+        sender,
+        subject,
+        msg,
+        address)
 
 
 def getLayoutVars():
@@ -215,8 +236,14 @@ def fbregister():
 	last_name = fb_resp['last_name']
 	fb_id = fb_resp['id']
 	fb_resp['registration_id'] = fb_resp['id']
-	fb_resp['password'] = ""
-	auth.get_or_create_user(fb_resp)
+	password = generate_new_password()
+	fb_resp['password'] = str(CRYPT()(password)[0])
+	newUser = False
+	if not db(db.auth_user.email == email).select().first():
+		newUser = True
+	user = auth.get_or_create_user(fb_resp)
+	if newUser:
+		send_register_mail(user,password,usingFB=True)
 	# from storage import Storage
 	# user = Storage(table_user._filter_fields(user, id=True)) 
 	# session.auth = Storage(user=user, last_visit=request.now, 
@@ -224,11 +251,15 @@ def fbregister():
 		# hmac_key = web2py_uuid()) 
 	# self.user = user
 	#return str(db(db.auth_user.email == email).select().first())
-	auth.login_bare(email,"")
+	#import pdb;pdb.set_trace()
+	#auth.login_bare(email,"")
+	auth.login_user(user)
 	#return "User:" + str(auth.login_bare(email,""))
 	redirect(URL('default','index'))
    
-   
+def generate_new_password(empty=None):
+	import random,base64,sha
+	return base64.b64encode(sha.sha(str(random.random())).hexdigest())[:8]
 
 def user():
     """

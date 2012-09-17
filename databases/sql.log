@@ -103,3 +103,43 @@ timestamp: 2012-07-06T22:38:01.188000
 ALTER TABLE auth_user ADD representation CHAR(512);
 timestamp: 2012-07-06T23:26:09.671000
 ALTER TABLE party ADD owner INTEGER REFERENCES auth_user(id) ON DELETE CASCADE;
+timestamp: 2012-09-18T00:05:55.888000
+ALTER TABLE party ADD guestlistsecrecy CHAR(512);
+timestamp: 2012-09-18T00:05:55.966000
+ALTER TABLE party ADD showmap CHAR(1);
+timestamp: 2012-09-18T00:05:56.040000
+ALTER TABLE party ADD secrecy CHAR(512);
+timestamp: 2012-09-18T00:05:56.119000
+CREATE TABLE invite(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email CHAR(512),
+    party INTEGER REFERENCES party (id) ON DELETE CASCADE
+);
+success!
+timestamp: 2012-09-18T00:05:56.199000
+ALTER TABLE guest_party_attending ADD restrictions CHAR(512);
+timestamp: 2012-09-18T00:05:56.266000
+ALTER TABLE guest_party_attending ADD maindishdrink CHAR(512);
+timestamp: 2012-09-18T00:05:56.338000
+ALTER TABLE guest_party_attending ADD avec CHAR(512);
+timestamp: 2012-09-18T00:05:56.405000
+ALTER TABLE guest_party_attending ADD other CHAR(512);
+timestamp: 2012-09-18T00:05:56.471000
+ALTER TABLE guest_party_attending ADD dessertdishdrink CHAR(512);
+timestamp: 2012-09-18T00:05:56.531000
+ALTER TABLE guest_party_attending ADD tablewish CHAR(512);
+timestamp: 2012-09-18T00:05:56.609000
+CREATE TABLE fb_auth_tokens(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
+    token CHAR(512),
+    expires TIMESTAMP
+);
+success!
+timestamp: 2012-09-18T00:05:56.676000
+CREATE TABLE fb_state_tokens(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token CHAR(512),
+    expires TIMESTAMP
+);
+success!
